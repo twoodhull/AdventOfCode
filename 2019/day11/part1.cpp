@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
     IntCodeMachine machine = IntCodeMachine::loadMachineFromFile(argv[1]);
 
     map<pair<int, int>, int> painted;
-    set<pair<int, int>> white;
+    set<pair<int, int>> black;
 
     pair<int, int> position(0, 0);
     int dir = 0;
@@ -24,14 +24,14 @@ int main(int argc, char** argv) {
     int count = 0;
 
     while (machine.getState() != MachineState::Done) {
-        int color = white.find(position) != white.end() ? WHITE : BLACK;
+        int color = black.find(position) == black.end() ? WHITE : BLACK;
         machine.queueInput(color);
         machine.runProgram();
 
-        if (machine.readNextOutput() == WHITE) {
-            white.insert(position);
+        if (machine.readNextOutput() == BLACK) {
+            black.insert(position);
         } else {
-            white.erase(position);
+            black.erase(position);
         }
 
         painted[position]++;
