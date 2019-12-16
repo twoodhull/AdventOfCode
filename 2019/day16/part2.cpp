@@ -23,8 +23,6 @@ int main() {
     }
 
     vector<int> realSequence((numberSequence.size() * REPEAT) - offset);
-
-    string seqString = "";
     for (int i = realSequence.size(); i > 0; i--) {
         int negativeIndex = (realSequence.size() - i) % numberSequence.size();
 
