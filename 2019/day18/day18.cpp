@@ -11,18 +11,18 @@ using namespace std;
 struct State {
     int keyMask;
     int steps;
-    vector<char> at;
+    long long atMask;
 
     State() = delete;
-    State(const vector<char>& at) :
+    State(long long at) :
         keyMask(0),
         steps(0),
-        at(at)
+        atMask(at)
     {}
     State(const State& other) :
         keyMask(other.keyMask),
         steps(other.steps),
-        at(other.at)
+        atMask(other.atMask)
     {}
 
     bool operator<(const State& other) const {
@@ -30,12 +30,7 @@ struct State {
     }
 
     bool operator==(const State& other) const {
-        bool isEqual = true;
-        for (int i = 0; i < at.size() && isEqual; i++) {
-            isEqual = at[i] == other.at[i];
-        }
-
-        return isEqual && keyMask == other.keyMask;
+        return atMask == other.atMask && keyMask == other.keyMask;
     }
 
     void addKey(char c) {
@@ -47,17 +42,20 @@ struct State {
         c = tolower(c);
         return ((1 << (c - 'a')) & keyMask) != 0;
     }
+
+    char getAt(int index) {
+        return (char)(atMask >> (index * 8));
+    }
+
+    void setAt(int index, char c) {
+        atMask &= ~(((1LL << (index * 8)) - 1LL) ^ ((1LL << (index * 8 + 8)) - 1LL));
+        atMask |= (c << (index * 8));
+    }
 };
 
 struct Hasher {
     size_t operator()(const State& state) const {
-        size_t charHash = 0;
-
-        for (char c : state.at) {
-            charHash = charHash * 31 + hash<char>()(c);
-        }
-
-        return hash<int>()(state.keyMask) * 31 + charHash;
+        return hash<int>()(state.keyMask) * 31 + hash<int>()(state.atMask);
     }
 
     template <class T1, class T2>
@@ -162,8 +160,12 @@ int main() {
 
     priority_queue<State> q;
     unordered_map<State, int, Hasher> visitedMap;
-    vector<char> at = {'0', '1', '2', '3'};
-    q.push(State(at));
+    int atMask = 0;
+    atMask = (atMask << 8) | '0';
+    atMask = (atMask << 8) | '1';
+    atMask = (atMask << 8) | '2';
+    atMask = (atMask << 8) | '3';
+    q.push(State(atMask));
 
     int minSteps = INT_MAX;
 
@@ -182,8 +184,8 @@ int main() {
             break;
         }
 
-        for (int i = 0; i < cur.at.size(); i++) {
-            char at = cur.at[i];
+        for (int i = 0; i < 4; i++) {
+            char at = cur.getAt(i);
 
             for (char c : keys) {
                 if (c == at) {
@@ -202,7 +204,7 @@ int main() {
                 }
 
                 State next(cur);
-                next.at[i] = c;
+                next.setAt(i, c);
                 next.steps += stepKeyPair.steps;
                 next.addKey(c);
 
