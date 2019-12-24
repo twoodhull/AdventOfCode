@@ -27,19 +27,6 @@ vector<string> splitString(const string& str) {
     return ret;
 }
 
-struct State {
-    int location;
-    int visitedMask;
-    int distance;
-
-    State() : State(0, 1, 0) {}
-    State(int location, int visitedMask, int distance) : location(location), visitedMask(visitedMask), distance(distance) {}
-
-    bool operator<(const State& other) const {
-        return distance > other.distance;
-    }
-};
-
 pair<int, int> findDist(vector<int>& perm, int used, int index, const map<pair<int, int>, int>& distanceMap) {
     if (index == perm.size()) {
         int ret = 0;
